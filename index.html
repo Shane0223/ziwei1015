@@ -1,0 +1,834 @@
+<title>紫微手牌</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+/* 版面：手機單欄 App——上方輸入卡、黏住的分頁列、各分頁一張張卡片；桌機置中最寬 560px */
+:root {
+  --bg: #f2f3f7; --surface: #ffffff; --ink: #1c2132; --muted: #646b80; --line: #dde0e9;
+  --accent: #5a3b8c; --accent-ink: #ffffff; --accent-soft: #ece6f6;
+  --gold: #b0841a; --good: #24704c; --good-soft: #e3f2ea; --weak: #b03636; --weak-soft: #f8e5e5; --mid: #7b8092; --mid-soft: #eceef3;
+  --f-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --f-body: -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Heiti TC", sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11131b; --surface: #1a1d28; --ink: #e7e9f1; --muted: #9ba2b6; --line: #2b2f3e;
+  --accent: #b9a0e6; --accent-ink: #17121f; --accent-soft: #2a2340;
+  --gold: #e2b84c; --good: #6fcb9c; --good-soft: #17332a; --weak: #f08585; --weak-soft: #3a1f22; --mid: #a3a8b8; --mid-soft: #262a36;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #11131b; --surface: #1a1d28; --ink: #e7e9f1; --muted: #9ba2b6; --line: #2b2f3e;
+  --accent: #b9a0e6; --accent-ink: #17121f; --accent-soft: #2a2340;
+  --gold: #e2b84c; --good: #6fcb9c; --good-soft: #17332a; --weak: #f08585; --weak-soft: #3a1f22; --mid: #a3a8b8; --mid-soft: #262a36;
+  color-scheme: dark; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px 40px; }
+.wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding-top: 6px; }
+h1 { font-family: var(--f-display); font-size: 26px; margin: 0; letter-spacing: .04em; }
+h1 .star { color: var(--gold); font-size: 18px; vertical-align: 3px; margin-right: 4px; }
+.sub { color: var(--muted); font-size: 13px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+h2 { font-family: var(--f-display); font-size: 18px; margin: 0; }
+h3 { font-size: 15px; margin: 0; color: var(--muted); font-weight: 600; letter-spacing: .04em; }
+label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px; }
+input, select, textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+textarea { min-height: 76px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid2 > * { min-width: 0; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { flex: 1; border: 0; background: var(--bg); color: var(--ink); font: inherit; padding: 10px 0; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn { border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 600; padding: 12px 16px; cursor: pointer; }
+.btn.ghost { background: var(--accent-soft); color: var(--accent); }
+.btn.small { padding: 8px 12px; font-size: 14px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+.err { color: var(--weak); font-size: 14px; }
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; gap: 4px; }
+.tabs button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 15px; padding: 8px 0; border-radius: 9px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.who { font-size: 14px; color: var(--muted); }
+.who b { color: var(--ink); font-size: 16px; }
+.flag { background: var(--weak-soft); color: var(--weak); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
+/* 家長卡 */
+.q { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+.q:last-child { border-bottom: 0; }
+.q p { margin: 0; }
+.q .num { color: var(--accent); font-weight: 700; margin-right: 4px; font-variant-numeric: tabular-nums; }
+.yn { display: flex; gap: 8px; }
+.yn button { flex: 1; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 8px 0; font: inherit; cursor: pointer; }
+.yn button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.verdict { border-radius: 10px; padding: 10px 12px; font-size: 15px; }
+.verdict.ok { background: var(--good-soft); color: var(--good); }
+.verdict.no { background: var(--weak-soft); color: var(--weak); }
+.verdict.wait { background: var(--mid-soft); color: var(--muted); }
+.stars { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 6px; align-items: center; }
+.stars .s { color: var(--gold); letter-spacing: 2px; font-size: 17px; white-space: nowrap; }
+.hl { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; }
+.act { border-left: 3px solid var(--gold); padding: 2px 0 2px 12px; }
+.act small { display: block; color: var(--muted); font-size: 14px; margin-top: 4px; }
+details summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+pre.key { white-space: pre-wrap; font-family: inherit; font-size: 14px; background: var(--bg); border-radius: 10px; padding: 10px 12px; margin: 8px 0 0; }
+/* 手牌 */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--bg); border-radius: 10px; padding: 8px 10px; }
+.stat .k { font-size: 12px; color: var(--muted); }
+.stat .v { font-size: 18px; white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pal { display: grid; grid-template-columns: 4.6em 1fr auto; gap: 4px 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.pal:last-child { border-bottom: 0; }
+.pal .nm { font-weight: 700; }
+.pal .nm small { color: var(--muted); font-weight: 400; margin-left: 2px; }
+.bar { position: relative; height: 8px; background: var(--mid-soft); border-radius: 4px; }
+.bar::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--line); }
+.bar i { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.sc { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 3.6em; text-align: right; }
+.pill { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 6px; padding: 1px 7px; margin-left: 6px; }
+.g-好 { background: var(--good-soft); color: var(--good); } .g-中 { background: var(--mid-soft); color: var(--mid); } .g-弱 { background: var(--weak-soft); color: var(--weak); }
+.pal .det { grid-column: 2 / 4; font-size: 14px; color: var(--muted); min-width: 0; }
+.pal .det .st { color: var(--ink); }
+.pal .det .hua { color: var(--accent); margin-left: 6px; }
+.tag { display: inline-block; font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; margin: 4px 4px 0 0; }
+/* 應對表 */
+.yr { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.yr:last-child { border-bottom: 0; }
+.yr .t { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.yr .t b { font-size: 17px; font-variant-numeric: tabular-nums; }
+.yr .t span { color: var(--muted); font-size: 13px; }
+.mv { display: grid; grid-template-columns: 2em 1fr; gap: 8px; align-items: start; }
+.seal { width: 2em; height: 2em; border-radius: 6px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; }
+.seal.lu { background: var(--good-soft); color: var(--good); } .seal.ji { background: var(--weak-soft); color: var(--weak); }
+.mv .a { font-weight: 700; }
+.mv small { color: var(--muted); }
+.red { background: var(--weak); color: var(--surface); border-radius: 6px; padding: 1px 8px; font-size: 13px; font-weight: 700; }
+.note { color: var(--muted); font-size: 13px; }
+#pOut { min-height: 220px; font-size: 13px; }
+footer { color: var(--muted); font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+@media (prefers-reduced-motion: no-preference) { .fade { animation: f .25s ease-out; } @keyframes f { from { opacity: .4; } to { opacity: 1; } } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1><span class="star">★</span>紫微手牌</h1>
+    <span class="sub">三合派｜手機版</span>
+  </header>
+
+  <form class="card" id="f" novalidate>
+    <div>
+      <label for="nm">名字（也用來記住最近查過的人）</label>
+      <input id="nm" autocomplete="off" value="範例（虛構生日）">
+    </div>
+    <div class="grid2">
+      <div><label for="bd">國曆生日</label><input id="bd" type="date" min="1901-01-01" max="2099-12-31" value="2000-01-01"></div>
+      <div><label for="bt">出生時間（鐘錶時間）</label><input id="bt" type="time" value="12:00"></div>
+    </div>
+    <div class="grid2">
+      <div><label id="sexL">性別</label>
+        <div class="seg" role="group" aria-labelledby="sexL"><button type="button" id="sexM" aria-pressed="true">男</button><button type="button" id="sexF" aria-pressed="false">女</button></div></div>
+      <div><label for="y0">應對表從哪年起（看 5 年）</label><input id="y0" type="number" inputmode="numeric" min="1901" max="2150"></div>
+    </div>
+    <button class="btn" id="go" type="submit">排盤</button>
+    <div class="err" id="err" hidden></div>
+    <div id="recentBox" hidden><label>最近查過</label><div class="chips" id="recent"></div></div>
+  </form>
+
+  <nav class="tabs" role="tablist" aria-label="結果分頁">
+    <button role="tab" id="t-card" aria-selected="true" aria-controls="p-card">家長卡</button>
+    <button role="tab" id="t-hand" aria-selected="false" aria-controls="p-hand">手牌</button>
+    <button role="tab" id="t-year" aria-selected="false" aria-controls="p-year">應對表</button>
+    <button role="tab" id="t-prompt" aria-selected="false" aria-controls="p-prompt">報告</button>
+  </nav>
+
+  <div class="who card" id="who"></div>
+
+  <section id="p-card" role="tabpanel" aria-labelledby="t-card" class="card fade"></section>
+  <section id="p-hand" role="tabpanel" aria-labelledby="t-hand" class="card fade" hidden></section>
+  <section id="p-year" role="tabpanel" aria-labelledby="t-year" class="card fade" hidden></section>
+  <section id="p-prompt" role="tabpanel" aria-labelledby="t-prompt" class="card fade" hidden>
+    <h2>紫微報告 prompt</h2>
+    <p class="note" style="margin:0">填完按「產生」，複製後到 Claude 開新對話貼上送出。八字 prompt 目前請用電腦版。</p>
+    <div><label for="pl">出生地（換算真太陽時）</label><select id="pl"></select></div>
+    <div><label for="si">目前身分與處境</label><input id="si" placeholder="例：40 歲上班族，兩個小孩，正在考慮轉職"></div>
+    <div><label for="ev">過去大事，一行一件（可留空）</label><textarea id="ev" placeholder="例：2012 考上郵局"></textarea></div>
+    <div><label for="qq">想問的問題，1–3 個（可留空）</label><textarea id="qq"></textarea></div>
+    <div class="grid2">
+      <div><label id="mdL">報告模式</label><div class="seg" role="group" aria-labelledby="mdL"><button type="button" id="mdA" aria-pressed="true">A 完整</button><button type="button" id="mdB" aria-pressed="false">B 回顧</button></div></div>
+      <div><label id="fsL">第一份報告？</label><div class="seg" role="group" aria-labelledby="fsL"><button type="button" id="fsY" aria-pressed="true">是</button><button type="button" id="fsN" aria-pressed="false">否</button></div></div>
+    </div>
+    <label class="row" for="hd" style="color:var(--ink);font-size:15px"><input id="hd" type="checkbox" checked style="width:auto"> 附上手牌十二宮強弱分數</label>
+    <button class="btn" id="pGo" type="button">產生</button>
+    <textarea id="pOut" readonly hidden aria-label="產生的 prompt"></textarea>
+    <div class="row" id="pAct" hidden><button class="btn small" id="pCopy" type="button">複製全文</button><span class="note" id="pMsg"></span></div>
+    <p class="note" style="margin:0">手機版資料區與電腦版相同，只是雜曜只列 23 顆（電腦版 42 顆）。</p>
+  </section>
+
+  <footer>
+    <div>所有計算都在這支手機的瀏覽器裡完成，生日資料不會上傳。分數是用來排步調、找要補強的地方，不是預測。</div>
+    <details><summary>怎麼放到手機桌面</summary>
+      <div style="margin-top:6px">iPhone：用 Safari 打開這個連結 → 下方「分享」→「加入主畫面」。<br>Android：用 Chrome 打開 → 右上角「⋮」→「加到主畫面」。</div>
+    </details>
+  </footer>
+</div>
+
+<script>
+var ZD={"BRIGHT": {"紫微": ["平", "廟", "廟", "旺", "得", "旺", "廟", "廟", "旺", "旺", "得", "旺"], "天機": ["廟", "陷", "得", "旺", "利", "平", "廟", "陷", "得", "旺", "利", "平"], "太陽": ["陷", "不", "旺", "廟", "旺", "旺", "廟", "得", "得", "平", "不", "陷"], "武曲": ["旺", "廟", "得", "利", "廟", "平", "旺", "廟", "得", "利", "廟", "平"], "天同": ["旺", "不", "利", "平", "平", "廟", "陷", "不", "旺", "平", "平", "廟"], "廉貞": ["平", "利", "廟", "平", "利", "陷", "平", "利", "廟", "平", "利", "陷"], "天府": ["廟", "廟", "廟", "得", "廟", "得", "旺", "廟", "得", "旺", "廟", "得"], "太陰": ["廟", "廟", "旺", "陷", "陷", "陷", "不", "不", "利", "不", "旺", "廟"], "貪狼": ["旺", "廟", "平", "利", "廟", "陷", "旺", "廟", "平", "利", "廟", "陷"], "巨門": ["旺", "不", "廟", "廟", "陷", "旺", "旺", "不", "廟", "廟", "陷", "旺"], "天相": ["廟", "廟", "廟", "陷", "得", "得", "廟", "得", "廟", "陷", "得", "得"], "天梁": ["廟", "旺", "廟", "廟", "廟", "陷", "廟", "旺", "陷", "得", "廟", "陷"], "七殺": ["旺", "廟", "廟", "旺", "廟", "平", "旺", "廟", "廟", "旺", "廟", "平"], "破軍": ["廟", "旺", "得", "陷", "旺", "平", "廟", "旺", "得", "陷", "旺", "平"], "文昌": ["旺", "廟", "陷", "利", "得", "廟", "陷", "利", "得", "廟", "陷", "利"], "文曲": ["廟", "廟", "平", "旺", "得", "廟", "陷", "旺", "得", "廟", "陷", "旺"], "左輔": ["旺", "廟", "廟", "陷", "廟", "平", "旺", "廟", "平", "陷", "廟", "不"], "右弼": ["廟", "廟", "旺", "陷", "廟", "平", "旺", "廟", "不", "陷", "廟", "平"], "天魁": ["旺", "旺", "旺", "廟", "旺", "旺", "旺", "旺", "旺", "旺", "旺", "旺"], "天鉞": ["旺", "旺", "旺", "旺", "旺", "旺", "旺", "旺", "廟", "廟", "旺", "旺"], "祿存": ["廟", "廟", "廟", "廟", "廟", "廟", "廟", "廟", "廟", "廟", "廟", "廟"], "擎羊": ["陷", "廟", "陷", "陷", "廟", "陷", "陷", "廟", "陷", "陷", "廟", "陷"], "陀羅": ["陷", "廟", "陷", "陷", "廟", "陷", "陷", "廟", "陷", "陷", "廟", "陷"], "火星": ["陷", "得", "廟", "利", "陷", "得", "廟", "利", "陷", "得", "廟", "利"], "鈴星": ["陷", "得", "廟", "利", "陷", "得", "廟", "利", "陷", "得", "廟", "利"], "地空": ["平", "陷", "陷", "平", "陷", "廟", "廟", "平", "廟", "廟", "陷", "陷"], "地劫": ["陷", "陷", "平", "平", "陷", "不", "廟", "平", "廟", "平", "平", "旺"]}, "ZAI_MEANING": {"天馬": "變動、遷移、奔波", "紅鸞": "婚戀喜事、人緣", "天喜": "喜慶、添丁", "天刑": "自律、法規；刑傷手術", "天姚": "風流、才藝、人緣", "龍池": "才藝、文采", "鳳閣": "儀表、文采", "三台": "地位、排場", "八座": "地位、排場", "恩光": "受提拔、榮譽", "天貴": "貴人、榮譽", "台輔": "輔佐、名銜", "封誥": "名銜、受封", "天官": "官貴", "天福": "福氣", "孤辰": "孤獨、六親緣薄", "寡宿": "孤獨、六親緣薄", "華蓋": "宗教、藝術、孤高", "咸池": "桃花、酒色", "破碎": "耗損、不完整", "蜚廉": "口舌、小人", "天哭": "憂傷", "天虛": "空虛、虛耗"}, "LABEL": {"命宮": "自己的主見與行動力", "兄弟": "跟兄弟姊妹、平輩相處", "遷移": "在外面的表現力", "交友": "交朋友", "疾厄": "體力活力", "父母": "跟老師、長輩的緣分", "官祿": "學習的穩定度", "福德": "情緒調節", "財帛": "管自己的東西", "田宅": "在家的安定感"}, "STRONG": {"命宮": "很有自己的主見，想做的事會自己先動手。", "兄弟": "跟兄弟姊妹或同齡玩伴處得來，會互相幫忙。", "遷移": "一出門、人一多，就比在家更有精神、更敢表現。", "交友": "很容易交到朋友，常有同學主動找他玩。", "疾厄": "體力很好，跑跳一整天也很少喊累。", "父母": "老師、長輩常稱讚他，或特別照顧他。", "官祿": "上課、寫功課能照規律來，不太需要大人一直催。", "福德": "心情穩定，不開心時很快就能自己轉換過來。", "財帛": "會顧好自己的東西，很少弄丟文具、水壺。", "田宅": "在家很安穩，喜歡待在自己的房間或小角落。"}, "WEAK": {"命宮": "自己一個人時常不知道要做什麼，要有人帶才會動。", "兄弟": "跟兄弟姊妹常吵架，或互相看不順眼。", "遷移": "到陌生場合會變得很安靜、不太敢表現，比在家拘謹。", "交友": "交朋友比較慢，或常跟同學起摩擦。", "疾厄": "容易累、容易生小病，作息一亂就不舒服。", "父母": "跟長輩或老師容易頂嘴、起摩擦。", "官祿": "寫功課要一直催，坐不太住。", "福德": "生氣或不開心時講不出原因，只會說「我不要」或發脾氣。", "財帛": "東西常常帶去就帶不回來，對自己的東西沒什麼概念。", "田宅": "在家不太定得下來，常想往外跑。"}, "ACTION": {"命宮": ["每天給他一件「自己決定、自己完成」的小任務，例如決定晚餐的一道菜、自己整理明天的書包。", "一個月後，他會不會主動說「這個我來」。"], "兄弟": ["兄弟姊妹各有自己的空間和規則；吵架時大人不當裁判，讓兩人各說一次發生什麼事。", "記一週吵架次數，一個月後再記一週來比。"], "遷移": ["每週帶他去一個新地方（公園、圖書館、市場），先陪他看，再讓他自己去試一件小事。", "一個月後，他在新地方開口或主動去試的時間有沒有變短。"], "交友": ["固定約一位玩伴，每週一起玩一次，讓他練習跟同一個人長期相處。", "兩個月後，他會不會主動提起這位朋友。"], "疾厄": ["固定睡覺時間，睡前 30 分鐘不看螢幕，放學先到戶外跑跳 30 分鐘。", "記一週「喊累或不舒服」的次數，一個月後再比。"], "父母": ["每週固定一次，讓他跟你說一件學校的事，大人只聽、不評論、不說教。", "一個月後，他會不會主動來找你講事情。"], "官祿": ["功課切成 10 到 15 分鐘一段，每段寫完勾一格，勾滿換一個小獎勵。", "記一週「拖多久才開始寫」，一個月後再比。"], "福德": ["跟他約好一個「暫停手勢」：生氣時先比手勢，大人看到就先停；平靜後用「你是覺得不公平，還是覺得做不好？」這種二選一問法，幫他把話說出來。", "記一週發脾氣的次數，一個月後再記一週來比；能說出原因的次數變多就是進步。"], "財帛": ["每樣東西有固定位置，門口貼一張用圖畫的「出門檢查表」，出門前自己對一次。", "記一週「東西弄丟或忘了帶」的次數，一個月後再比。"], "田宅": ["幫他布置一個屬於自己的小角落，每天固定一段時間在那裡做自己喜歡的事。", "一個月後，他在家能自己安靜待著的時間有沒有變長。"]}, "NAYIN_NAMES": ["海中金", "爐中火", "大林木", "路旁土", "劍鋒金", "山頭火", "澗下水", "城頭土", "白蠟金", "楊柳木", "泉中水", "屋上土", "霹靂火", "松柏木", "長流水", "沙中金", "山下火", "平地木", "壁上土", "金箔金", "覆燈火", "天河水", "大驛土", "釵釧金", "桑柘木", "大溪水", "沙中土", "天上火", "石榴木", "大海水"], "ZIWEI_PROMPT": "你是一位資深的八字／紫微斗數解讀者，服務對象是付費諮詢的一般民眾。\n你的專業風格是：務實、具體、可執行，說人話，不用宿命論的語言，\n也不誇大自己能算到的範圍。\n\n## 絕對禁令（違反任何一條即為不合格輸出）\n\n1. 不得自行排盤或推算干支、宮位、起運歲數、大運順逆、流年干支。\n   你只能使用下方提供的資料。\n2. 不得預測死亡、重大疾病、壽命、意外。健康只談體質傾向與作息建議。\n3. 不得提供具體投資標的、買賣時機、金額建議。\n4. 不得使用恐嚇性語言。\n5. 不得推銷任何法事、開運物、改運服務。\n6. 不得使用絕對化斷語（「一定會」「注定」「必然」），改用傾向性描述。\n7. 不得為了讓報告看起來完整，而補上資料不支持的內容。\n8. 不得將任何一步大運／大限標記為「好運」或「壞運」。\n   那是環境，不是吉凶。要描述「這是什麼樣的環境」與「該怎麼走」。\n9. 不得預言具體災禍的發生年份。可談環境特性與該留意什麼，不得指認事件。\n\n## ★★ 白話化規則（最高優先，與其他規則衝突時以本規則為準）\n\n讀者是完全沒學過命理的零基礎高中生。他願意讀，但沒義務查任何一個詞。\n\n**規則 1｜括號隔離**\n正文用純白話寫完整，盤面依據只能放句末括號當註腳。\n驗收：刪掉全文所有括號後，文章必須仍然完整通順、意思不變。\n\n**規則 2｜正文禁用詞**\n以下只能出現在括號內：化祿、化權、化科、化忌、三方四正、空宮、煞星、祿存、\n羊陀火鈴、日主、月令、所有十神名稱、通根、藏干、旺衰、身強身弱、沖、刑、克、\n合、會照、所有格局名稱。\n「大限／大運」正文改寫為時間本身（「2020 到 2029 這十年」）。\n宮位名稱正文改白話（事業宮→工作這一塊）。\n\n**規則 3｜禁止翻譯式寫法**\n不得寫「你有天梁星（天梁是穩重的星）」。正文根本不要提那個名詞，\n直接講它在生活裡長什麼樣子。\n\n**規則 4｜抽象形容換成具體場景**\n不寫「你個性內斂不擅爭取」，要寫「開會時你通常等別人講完才開口，\n事情做完也不太主動說是自己做的」。\n每個特質描述都要能讓客戶想起一個真實發生過的場景。\n\n**規則 5｜反向護欄：白話不等於空泛**\n每個論斷都要通過測試：換到另一個陌生人身上還成立嗎？成立就是太籠統，重寫。\n具體度只能提高，不能下降。\n\n**規則 6｜比喻之後必須接實例**\n只有比喻沒有實例，等於沒說。\n\n## 論斷依據規則\n\n每一個論斷，句末必須以括號標出盤面依據，且須符合白話化規則 1。\n沒有盤面依據的論斷，一律不得寫出。\n\n## ★ 大運與流年的解讀規則\n\n**A. 大運是環境，不是評分**\n判斷依據是大運干支與本命的互動關係，不是大運本身的字面吉凶。\n\n**B. 天干與地支分開講**\n天干偏外顯環境與機會形式，地支偏內在根基與實質得失，通常影響更深。\n一般前五年天干作用明顯、後五年地支明顯（傾向而非鐵律）。\n\n**C. 交運期**\n大運交接前後約一年常有明顯變動。若客戶正處交運期，必須主動點出。\n\n**D. 流年是觸發器**\n流年只能觸發大運已鋪好的環境，不得脫離大運單獨論流年。\n\n**E. 回測優先（最重要）**\n若提供了「客戶過去大事」，必須先回測再談未來：\n逐一對照事件當時的大運流年 → 說明那個環境為何容易導向這類事件 →\n誠實評估吻合度。**對不上的必須明說對不上，不得硬凹。**\n\n**F. 缺時辰時**\n大運照常解讀，註明起運歲數約有 ±4 個月誤差。\n若某事件落在兩步大運交界附近，須說明歸屬需視精確時辰而定。\n\n## ★ 資料完整度分支\n\n本次資料完整度：{{完整 / 缺時辰 / 只知大概時段}}\n\n若為「缺時辰」：\n- 可讀：日主與月令的關係、年月柱十神、日支配偶宮、三柱生剋、大運流年\n- 不可讀：任何時柱依據的論斷、子女細節、晚年細部、全部紫微宮位\n- 旺衰若落在臨界，必須並列兩種可能並各自給建議，不得擅自選一\n- 第一段結尾加入範圍說明，語氣專業不道歉\n\n## ★ 輸出模式選擇\n\n本次模式：{{模式A 完整分析版 / 模式B 生命回顧敘事版}}\n是否為該客戶首次報告：{{是 / 否}}\n\n模式 B 需要完整時辰。若缺時辰，不得輸出模式 B，\n改回覆「此模式需要出生時辰，建議改用完整分析版」。\n\n模式 B 的段 2、3、4 所指認的人生階段，**必須以客戶自述的過去大事為準**。\n若客戶未提供，改寫為推測語氣並明白標示，嚴禁自行認定客戶哪段人生過得好或不好。\n\n---\n\n### 【模式 A】完整分析版．七段．3000-4000 字（缺時辰 2500-3200 字）\n\n**一、盤面速覽與本次解讀範圍**（約 350 字）\n客觀陳述，讓客戶確認資料無誤。缺時辰者附範圍說明。\n\n**二、你的核心三特質**（約 550 字）\n每項：一句話結論 → 為什麼 → 生活中的具體例子。\n\n**三、你的優勢，以及怎麼用在對的地方**（約 450 字）\n明確指出哪類環境放大它、哪類浪費它。\n\n**四、你的卡點，以及怎麼繞過去**（約 450 字）\n每個卡點必須配一個具體替代做法。\n\n**五、你的人生節奏**（約 900 字，本報告重心）\n5-1 回測：對照過去大事與當時環境，誠實評估吻合度\n5-2 你現在在哪：目前這十年的環境特性、還剩幾年、是否正在轉換期\n5-3 下一步：下一個十年的轉向，現在該預先準備什麼\n\n**六、針對你的提問**（約 700 字）\n逐題回應，每題同時扣住本命與目前這十年。\n\n**七、未來 12 個月的三個具體行動**（約 350 字）\n每項要有「做什麼」「什麼時候」「怎麼判斷有沒有效」。\n\n---\n\n### 【模式 B】生命回顧敘事版．八段．1800-2500 字\n\n**段 0 ─ 一句聲明**（僅首次報告出現）\n最多兩句。命盤講的是傾向與環境，不是判決。不得道歉、不得寫成免責條款。\n\n**段 1 ─ 基本資料與人生階段序列**（約 250 字）\n列出各階段的年齡與西元年份、標記現在所在階段。\n本段不做任何解讀，一句評價都不能有。\n\n**段 2 ─【順境段】**（約 350 字）\n依序回答三問：為什麼那時候好 → 那份順利是從哪裡來的 → 為什麼沒守住。\n來源必須明確指出。第三問是重點：通常那份資源是那十年借給他的，不是本來就有的，\n時間一過就收回去了。\n\n**段 3 ─【失焦段】**（約 300 字）\n依序回答：那幾年重心該放在哪一塊 → 那一塊當時被什麼卡住。\n不得暗示客戶當年做錯選擇，寫成「當時的結構讓那一塊特別難施力」。\n\n**段 4 ─【低潮段】**（約 350 字）\n指認年份 → 說明那個結構在生活裡長成什麼樣子（使不上力、努力沒回饋、\n方向感消失）→ 說明同樣的努力放在別的階段結果會不同，差別在環境不在能力。\n每句都要有括號依據。不得替客戶下「這不是你的錯」的結論，\n把事實攤開讓他自己得出。不得延伸為「所以不用檢討」。\n\n**段 5 ─【現在這十年】**（約 400 字）\n現在被啟動的是什麼 → 至少三個這個月能開始的具體動作。\n建議必須從被啟動的結構推導，不得是通用勵志語。\n\n**段 6 ─【只講一條】**（約 180 字）\n**嚴格只寫一條**要避開的事。選最容易讓他重蹈段 3、段 4 覆轍的那一件。\n要具體到能當場辨認。不得恐嚇。\n\n**段 7 ─ 一句非命理的話**（一句，最多兩句）\n完全不使用命理術語，連括號都不要。不說教、不勵志口號。\n指向他這些年扛著的某個自我譴責，說明那不屬於他。\n必須具體到換一個人身上就不成立。\n\n**段 8 ─ 一個落地的下一步提議**（約 120 字）\n一個，不是清單。小到本週能做完，且有明確完成判準。\n\n---\n\n## 資料區\n\n**命盤資料**\n{{三柱或四柱干支、十神、藏干；或紫微十二宮主星、四化、三方四正}}\n\n**大運／大限資料**\n{{起運歲數、順逆、各步干支與對應年齡及西元年份、現行標記、今年與明年流年}}\n\n**客戶基本資訊**\n- 性別：{{性別}}\n- 目前年齡：{{年齡}}\n- 出生時段（若知道）：{{清晨／上午／中午／下午／傍晚／晚上／半夜／完全不知}}\n- 目前身分與處境：{{例：40歲上班族，兩個小孩，正在考慮轉職}}\n\n**客戶過去大事（用於回測，可留空）**\n{{年份＋事件，3-5 件}}\n\n**客戶提問**\n{{1-3 個問題}}\n\n---\n\n## 文末固定附上（原文照抄）\n\n「本報告為命理性質的自我探索參考，不構成醫療、法律、投資、婚姻或任何專業建議。\n您的人生決定權完全在您自己手上。」\n\n（若括號內術語超過 10 個，可在免責聲明前加一個「如果你想知道那些括號在講什麼」\n的小附錄，每個詞一句話解釋。此附錄不得作為正文使用術語的藉口。）\n\n---\n\n## 交付前自我檢查（逐條確認，任一未過就重寫）\n\n**白話化**\n- [ ] 把全文所有括號刪掉，文章還完整通順嗎？\n- [ ] 正文（括號外）有沒有出現任何禁用詞？\n- [ ] 有沒有「名詞＋解釋」的翻譯式寫法？\n- [ ] 特質描述是具體場景，還是抽象形容詞？\n- [ ] 每個論斷換到陌生人身上還成立嗎？成立即太籠統，重寫。\n\n**準確性**\n- [ ] 每個論斷都有括號依據？\n- [ ] 有沒有把任何一段時期寫成「好運／壞運」？\n- [ ] 有沒有預言具體災禍年份？\n- [ ] 回測時，對不上的有沒有誠實說對不上？\n- [ ] 缺時辰時，是否完全沒有引用時柱？\n\n**模式 B 專用**\n- [ ] 段 1 是否完全沒有解讀？\n- [ ] 段 2 的「為什麼沒守住」有沒有真的回答？\n- [ ] 段 2/3/4 指認的年份，是否來自客戶自述？\n- [ ] 段 6 是否**只有一條**？\n- [ ] 段 7 是否零術語、零括號？換一個人身上還成立嗎？（成立即失敗）\n- [ ] 段 8 是否只有一個動作，且本週做得完？"};
+if(typeof module!=='undefined')module.exports=ZD;
+
+</script>
+<script>
+// 紫微手牌系統：JavaScript 版計算核心（逐行對照 Python 版 ziwei_paipan / ziwei_cards v9 / ziwei_strategy / parent_card / make_prompt）
+// 依賴 ZD（data.js：廟陷表、雜曜含義、家長卡文字、報告 prompt 原文）
+(function (root) {
+"use strict";
+const ZD = root.ZD || (typeof require !== "undefined" ? require("./data.js") : null);
+
+const GAN = "甲乙丙丁戊己庚辛壬癸", BR = "子丑寅卯辰巳午未申酉戌亥";
+const PAL = ["命宮", "兄弟", "夫妻", "子女", "財帛", "疾厄", "遷移", "交友", "官祿", "田宅", "福德", "父母"];
+const mod = (a, n) => ((a % n) + n) % n;
+const bi = b => BR.indexOf(b);
+const mv = (b, n) => BR[mod(bi(b) + n, 12)];
+function pyRound(x, d) {           // 與 Python round() 相同：以浮點數的精確十進位值判斷，剛好一半時取偶數
+  const s = Math.abs(x).toFixed(60), [ip, fp] = s.split("."), keep = fp.slice(0, d), rest = fp.slice(d);
+  let up;
+  if (rest[0] > "5") up = true;
+  else if (rest[0] < "5") up = false;
+  else up = /[1-9]/.test(rest.slice(1)) ? true : Number((ip + keep).slice(-1)) % 2 === 1;
+  const r = Number(BigInt(ip + keep) + (up ? 1n : 0n)) / Math.pow(10, d);
+  return x < 0 ? -r : r;
+}
+
+// ───────── 農曆（1900–2100 壓縮表，同 ziwei/lunar.py）─────────
+const LUNAR_INFO = [
+0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+0x06566,0x0d4a0,0x0ea50,0x16a95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x05ac0,0x0ab60,0x096d5,0x092e0,
+0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,
+0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,
+0x092e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
+0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,
+0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,
+0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,
+0x0d520];
+const leapMonth = y => LUNAR_INFO[y - 1900] & 0xF;
+const leapDays = y => leapMonth(y) ? ((LUNAR_INFO[y - 1900] & 0x10000) ? 30 : 29) : 0;
+const monthDays = (y, m) => (LUNAR_INFO[y - 1900] & (0x10000 >> m)) ? 30 : 29;
+function yearMonths(y) {
+  const out = [], lp = leapMonth(y);
+  for (let m = 1; m <= 12; m++) { out.push([m, false, monthDays(y, m)]); if (m === lp) out.push([m, true, leapDays(y)]); }
+  return out;
+}
+const DAY = 86400000;
+const dayNum = (y, m, d) => Math.floor(Date.UTC(y, m - 1, d) / DAY);
+function solarToLunar(y, m, d) {
+  let off = dayNum(y, m, d) - dayNum(1900, 1, 31);
+  if (off < 0 || y > 2100) throw new Error("只支援 1900/1/31 到 2100/12/31");
+  let ly = 1900;
+  for (;;) { const n = yearMonths(ly).reduce((a, x) => a + x[2], 0); if (off < n) break; off -= n; ly++; }
+  for (const [mm, leap, n] of yearMonths(ly)) { if (off < n) return { year: ly, month: mm, day: off + 1, leap }; off -= n; }
+}
+
+// ───────── 真太陽時（同 validation/validate.py）─────────
+function trueSolar(y, m, d, h, mi, tz, dst, lon) {
+  let t = Date.UTC(y, m - 1, d, h, mi) - dst * 3600000;
+  t += (lon - tz * 15) * 4 * 60000;
+  const dt = new Date(t), doy = dayNum(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate()) - dayNum(dt.getUTCFullYear(), 1, 1) + 1;
+  const b = 2 * Math.PI * (doy - 81) / 364;
+  const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+  t += Math.round(eot * 60000000) / 1000;          // 微秒精度，同 Python timedelta
+  return new Date(t);
+}
+const ymdhm = t => ({ y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate(), h: t.getUTCHours(), mi: t.getUTCMinutes() });
+const pad = n => String(n).padStart(2, "0");
+const fmt = t => `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())} ${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
+
+// ───────── 排盤（同 ziwei_paipan.py）─────────
+const SIHUA = { 甲: ["廉貞","破軍","武曲","太陽"], 乙: ["天機","天梁","紫微","太陰"], 丙: ["天同","天機","文昌","廉貞"],
+  丁: ["太陰","天同","天機","巨門"], 戊: ["貪狼","太陰","右弼","天機"], 己: ["武曲","貪狼","天梁","文曲"],
+  庚: ["太陽","武曲","太陰","天同"], 辛: ["巨門","太陽","文曲","文昌"], 壬: ["天梁","紫微","左輔","武曲"], 癸: ["破軍","巨門","太陰","貪狼"] };
+const BRIGHT = {}; for (const k in ZD.BRIGHT) { BRIGHT[k] = {}; ZD.BRIGHT[k].forEach((v, i) => BRIGHT[k][BR[i]] = v); }
+const MAIN14 = ["紫微","天機","太陽","武曲","天同","廉貞","天府","太陰","貪狼","巨門","天相","天梁","七殺","破軍"];
+const GOOD = ["左輔","右弼","文昌","文曲","天魁","天鉞","祿存"], BAD = ["擎羊","陀羅","火星","鈴星","地空","地劫"];
+const NAYIN = "金火木土金火水土金木水土火木水金火木土金火水土金木水土火木水";
+const JU = { 水: 2, 木: 3, 金: 4, 土: 5, 火: 6 };
+const KUI_YUE = { 甲: ["丑","未"], 戊: ["丑","未"], 庚: ["丑","未"], 乙: ["子","申"], 己: ["子","申"], 丙: ["亥","酉"], 丁: ["亥","酉"], 壬: ["卯","巳"], 癸: ["卯","巳"], 辛: ["午","寅"] };
+const LUCUN = { 甲: "寅", 乙: "卯", 丙: "巳", 丁: "午", 戊: "巳", 己: "午", 庚: "申", 辛: "酉", 壬: "亥", 癸: "子" };
+const HUO_LING = { 寅午戌: ["丑","卯"], 申子辰: ["寅","戌"], 巳酉丑: ["卯","戌"], 亥卯未: ["酉","戌"] };
+const YIN_STEM = { 甲: "丙", 己: "丙", 乙: "戊", 庚: "戊", 丙: "庚", 辛: "庚", 丁: "壬", 壬: "壬", 戊: "甲", 癸: "甲" };
+const palaceStem = (yg, b) => GAN[mod(GAN.indexOf(YIN_STEM[yg]) + mod(bi(b) - 2, 12), 10)];
+function jiazi(g, b) { for (let i = 0; i < 60; i++) if (GAN[i % 10] === g && BR[i % 12] === b) return i; }
+function ziweiPos(day, ju) { let x = 0; while ((day + x) % ju) x++; const q = Math.floor((day + x) / ju); const p = mv("寅", q - 1); return x % 2 ? mv(p, -x) : mv(p, x); }
+
+function lunarInfo(y, m, d, h, mi) {
+  const lu = solarToLunar(y, m, d), flags = [];
+  const yg = GAN[mod(lu.year - 4, 10)], yb = BR[mod(lu.year - 4, 12)];
+  let month = lu.month, day = lu.day;
+  if (lu.leap) { flags.push("閏月"); if (day > 15) month = month % 12 + 1; }
+  const hi = Math.floor((h + 1) / 2) % 12;
+  if (h === 23) flags.push("晚子時：日界有爭議");
+  if (mi === 0 || mi === 59 || (h % 2 === 1 && mi < 10) || (h % 2 === 0 && mi > 50)) flags.push("時辰交界±10分");
+  return { yg, yb, month, day, hi, flags, lunar: lu };
+}
+function paipan(y, m, d, h, mi, male) {
+  const L = lunarInfo(y, m, d, h, mi), { yg, yb, month, day, hi } = L;
+  const ming = mv("寅", (month - 1) - hi), shen = mv("寅", (month - 1) + hi);
+  const ju = JU[NAYIN[Math.floor(jiazi(palaceStem(yg, ming), ming) / 2)]];
+  const pos = {}, z = ziweiPos(day, ju);
+  ["紫微","天機","太陽","武曲","天同","廉貞"].forEach((s, i) => pos[s] = mv(z, [0, -1, -3, -4, -5, -8][i]));
+  const f = BR[mod(4 - bi(z), 12)];
+  ["天府","太陰","貪狼","巨門","天相","天梁","七殺","破軍"].forEach((s, i) => pos[s] = mv(f, [0, 1, 2, 3, 4, 5, 6, 10][i]));
+  pos["文昌"] = mv("戌", -hi); pos["文曲"] = mv("辰", hi);
+  pos["左輔"] = mv("辰", month - 1); pos["右弼"] = mv("戌", -(month - 1));
+  [pos["天魁"], pos["天鉞"]] = KUI_YUE[yg];
+  pos["祿存"] = LUCUN[yg]; pos["擎羊"] = mv(pos["祿存"], 1); pos["陀羅"] = mv(pos["祿存"], -1);
+  const grp = Object.keys(HUO_LING).find(k => k.includes(yb));
+  pos["火星"] = mv(HUO_LING[grp][0], hi); pos["鈴星"] = mv(HUO_LING[grp][1], hi);
+  pos["地劫"] = mv("亥", hi); pos["地空"] = mv("亥", -hi);
+  const sex = (GAN.indexOf(yg) % 2 === 0 ? "陽" : "陰") + (male ? "男" : "女");
+  return { year: yg + yb, month, day, hour: BR[hi], ming, shen, ju, sex, pos, flags: L.flags, lunar: L.lunar, male };
+}
+function toCards(c) {
+  const pos = c.pos, pals = {};
+  for (const b of BR) pals[b] = { main: [], hua: [], good: [], bad: [], extra: [] };
+  for (const s of MAIN14) pals[pos[s]].main.push([s, BRIGHT[s][pos[s]]]);
+  const hs = {}; SIHUA[c.year[0]].forEach((s, i) => hs[s] = "祿權科忌"[i]);
+  for (const s of GOOD) (hs[s] === "忌" ? pals[pos[s]].extra : pals[pos[s]].good).push([s, BRIGHT[s][pos[s]]]);
+  for (const s of BAD) pals[pos[s]].bad.push([s, BRIGHT[s][pos[s]]]);
+  for (const s in hs) pals[pos[s]].hua.push([hs[s], s, BRIGHT[s][pos[s]]]);
+  pals[BR[mod(bi(c.ming) - 5, 12)]]._jie = true;
+  for (const b of BR) pals[b]._hour = c.hour;
+  return [c.ming, pals];
+}
+function birthMeta(c, solarYear) {
+  const idx = jiazi(c.year[0], c.year[1]);
+  const cand = [solarYear - 1, solarYear].filter(yy => mod(yy - 4, 60) === idx);
+  return [c.year[0], c.sex, c.ju, cand.length ? cand[0] : solarYear];
+}
+const CHANGSHENG = ["長生","沐浴","冠帶","臨官","帝旺","衰","病","死","墓","絕","胎","養"];
+const CS_START = { 2: "申", 5: "申", 3: "亥", 4: "巳", 6: "寅" };
+const zipm = (a, b) => { const o = {}; [...a].forEach((x, i) => o[x] = b[i]); return o; };
+const TIANGUAN = zipm(GAN, "未辰巳寅卯酉亥酉戌午"), TIANFU_Z = zipm(GAN, "酉申子亥卯寅午巳午巳"), FEILIAN = zipm(BR, "申酉戌巳午未寅卯辰亥子丑");
+function zaiyao(c) {
+  const yg = c.year[0], yb = c.year[1], yi = bi(yb), m = c.month, d = c.day, hi = bi(c.hour), pos = c.pos, s = {};
+  const grp = ["寅午戌","申子辰","巳酉丑","亥卯未"].find(k => k.includes(yb));
+  s["天馬"] = { 寅午戌: "申", 申子辰: "寅", 巳酉丑: "亥", 亥卯未: "巳" }[grp];
+  s["華蓋"] = { 寅午戌: "戌", 申子辰: "辰", 巳酉丑: "丑", 亥卯未: "未" }[grp];
+  s["咸池"] = { 寅午戌: "卯", 申子辰: "酉", 巳酉丑: "午", 亥卯未: "子" }[grp];
+  s["紅鸞"] = mv("卯", -yi); s["天喜"] = mv(s["紅鸞"], 6);
+  s["天哭"] = mv("午", -yi); s["天虛"] = mv("午", yi);
+  s["龍池"] = mv("辰", yi); s["鳳閣"] = mv("戌", -yi);
+  const gu = { 寅卯辰: ["巳","丑"], 巳午未: ["申","辰"], 申酉戌: ["亥","未"], 亥子丑: ["寅","戌"] };
+  [s["孤辰"], s["寡宿"]] = gu[Object.keys(gu).find(k => k.includes(yb))];
+  s["破碎"] = "子午卯酉".includes(yb) ? "巳" : ("寅申巳亥".includes(yb) ? "酉" : "丑");
+  s["蜚廉"] = FEILIAN[yb];
+  s["天刑"] = mv("酉", m - 1); s["天姚"] = mv("丑", m - 1);
+  s["台輔"] = mv("午", hi); s["封誥"] = mv("寅", hi);
+  s["三台"] = mv(pos["左輔"], d - 1); s["八座"] = mv(pos["右弼"], -(d - 1));
+  s["恩光"] = mv(pos["文昌"], d - 2); s["天貴"] = mv(pos["文曲"], d - 2);
+  s["天官"] = TIANGUAN[yg]; s["天福"] = TIANFU_Z[yg];
+  const by = {}; for (const b of BR) by[b] = [];
+  for (const k in s) by[s[k]].push(k);
+  const fw = c.sex === "陽男" || c.sex === "陰女", st = CS_START[c.ju], cs = {};
+  for (let i = 0; i < 12; i++) cs[mv(st, fw ? i : -i)] = CHANGSHENG[i];
+  return [by, cs, s];
+}
+
+// ───────── 評分（同 ziwei_cards.py v9）─────────
+const MAIN_B = { 廟: 2, 旺: 1.5, 得: 1, 利: 0.5, 平: 0, 不: -0.5, 陷: -1 };
+const HUA_BASE = { 祿: 2, 權: 1.5, 科: 1, 忌: -3.5 };
+const HUA_GOOD_F = { 廟: 1, 旺: 1, 得: .8, 利: .8, 平: .7, 不: .5, 陷: .5 };
+const HUA_JI_F = { 廟: .7, 旺: .7, 得: .85, 利: .85, 平: 1, 不: 1.3, 陷: 1.3 };
+const GOOD_F = { 廟: 1, 旺: 1, 得: .8, 利: .8, 平: .6, 不: .2, 陷: .2 };
+const BAD_F = { 廟: .6, 旺: .6, 得: .8, 利: .8, 平: 1, 不: 1.4, 陷: 1.4 };
+const EMPTY_MAIN = 0.5, EMPTY_PEN = -0.5, W_SELF = 1, W_OPP = 0.5, W_TRI = 0.3, GEJU_W = 1.5, DX_W = 0.8, LN_W = 0.6, JIE_GOOD = 0;
+const LEVEL_TH = { 本命: [1.9, -0.15], 大限: [2.30, -0.21], 流年: [2.71, -0.15] };
+const GUJUN_F = 0.5, FU_F = 0.5, KONGKU = -1.0, CAIYIN = 1.0, XINGJI = -1.5, PO_F = 0.5, RIYUE = 0.5;
+const LUCKY6 = new Set(["左輔","右弼","文昌","文曲","天魁","天鉞"]);
+const LIUCHANG = zipm(GAN, "巳午申酉申酉亥子寅卯"), LIUQU = zipm(GAN, "酉申午巳午巳卯寅子亥");
+function sum(a) {                  // 同 Python 3.12+ 的 sum()：Neumaier 補償加總
+  let hi = 0, lo = 0;
+  for (const x of a) { const t = hi + x; lo += Math.abs(hi) >= Math.abs(x) ? (hi - t) + x : (x - t) + hi; hi = t; }
+  return lo && isFinite(lo) ? hi + lo : hi;
+}
+const sgn1 = v => (v < 0 || Object.is(v, -0) ? "-" : "+") + Math.abs(pyRound(v, 1)).toFixed(1);   // 同 Python f"{v:+.1f}"
+
+function tagV8(ming, pals, hour) {
+  for (const b of BR) { pals[b]._smod = {}; pals[b]._adj = 0.0; pals[b]._hour = hour; }
+  const stars = b => new Set([...pals[b].main, ...pals[b].good, ...(pals[b].extra || [])].map(x => x[0]));
+  const hasLu = zone => zone.some(b => stars(b).has("祿存") || pals[b].hua.some(h => h[0] === "祿"));
+  const day = bi(hour) >= 3 && bi(hour) <= 8;
+  for (const b of BR) {
+    const p = pals[b], mains = p.main.map(x => x[0]), sf = sfZone(b);
+    if (mains.includes("紫微") && !sf.some(x => [...stars(x)].some(s => LUCKY6.has(s)))) p._smod["紫微"] = [GUJUN_F, 0];
+    if (mains.includes("天府")) {
+      if (!hasLu(sf)) p._smod["天府"] = [FU_F, 0];
+      if (p.bad.some(x => x[0] === "地空" || x[0] === "地劫")) p._adj += KONGKU;
+    }
+    if (mains.includes("天相")) {
+      const n1 = BR[mod(bi(b) - 1, 12)], n2 = BR[mod(bi(b) + 1, 12)];
+      const lu = x => hasLu([x]), liang = x => pals[x].main.some(s => s[0] === "天梁");
+      const yang = x => pals[x].bad.some(s => s[0] === "擎羊"), ji = x => pals[x].hua.some(h => h[0] === "忌");
+      if ((lu(n1) && liang(n2)) || (lu(n2) && liang(n1))) p._adj += CAIYIN;
+      if ((yang(n1) && ji(n2)) || (yang(n2) && ji(n1))) p._adj += XINGJI;
+    }
+    if (mains.includes("破軍") && !hasLu(sf)) p._smod["破軍"] = [PO_F, 0];
+    if (mains.includes("太陽")) p._smod["太陽"] = [1.0, day ? RIYUE : -RIYUE];
+    if (mains.includes("太陰")) p._smod["太陰"] = [1.0, day ? -RIYUE : RIYUE];
+  }
+}
+const sfZone = b => { const i = bi(b); return [BR[i], BR[(i + 4) % 12], BR[(i + 6) % 12], BR[(i + 8) % 12]]; };
+function mainVal(p) {
+  if (!p.main.length) return null;
+  const vals = p.main.map(([s, b]) => { const [mult, add] = (p._smod || {})[s] || [1, 0]; const v = MAIN_B[b] + add; return v > 0 ? v * mult : v; });
+  return sum(vals) / vals.length;
+}
+function huaVal(h, mult, jie) {
+  const [kind, star, b] = h;
+  if (kind === "忌") return HUA_BASE["忌"] * HUA_JI_F[b] * mult;
+  if (star === "天梁" && kind === "祿") return 0;
+  return HUA_BASE[kind] * HUA_GOOD_F[b] * mult * (jie ? JIE_GOOD : 1);
+}
+function intrinsic(pals, b) {
+  const p = pals[b], jie = !!p._jie, m = mainVal(p);
+  const main = m !== null ? m : EMPTY_PEN;
+  const hua = sum(p.hua.map(h => huaVal(h, 1, jie))) + sum((p.dhua || []).map(h => huaVal(h, DX_W, jie))) + sum((p.lhua || []).map(h => huaVal(h, LN_W, jie)));
+  const good = sum(p.good.map(x => GOOD_F[x[1]])), bad = -sum(p.bad.map(x => BAD_F[x[1]]));
+  return main + hua + good + bad + (p._adj || 0);
+}
+function sfsz(pals, b) {
+  const i = bi(b);
+  return pyRound(W_SELF * intrinsic(pals, b) + W_OPP * intrinsic(pals, BR[(i + 6) % 12]) + W_TRI * (intrinsic(pals, BR[(i + 4) % 12]) + intrinsic(pals, BR[(i + 8) % 12])), 2);
+}
+function roleHand(pals, base) {
+  const i = bi(base), out = {};
+  PAL.forEach((pal, k) => { const b = BR[mod(i - k, 12)]; out[pal] = [sfsz(pals, b), b]; });
+  return out;
+}
+const lgrade = (s, level) => { const [g, b] = LEVEL_TH[level]; return s >= g ? "好" : (s <= b ? "弱" : "中"); };
+
+function starIndex(pals) {
+  const idx = {}, hua = [];
+  for (const b of BR) { const p = pals[b]; for (const [s, br] of [...p.main, ...p.good, ...p.bad]) idx[s] = [b, br]; for (const [k, s] of p.hua) hua.push([k, s, b]); }
+  return [idx, hua];
+}
+function chengse(idx, stars) {
+  const bs = stars.filter(s => idx[s] && idx[s][1]).map(s => MAIN_B[idx[s][1]] ?? 0);
+  return bs.length ? pyRound((sum(bs) / bs.length + 1) / 3, 2) : 0.5;
+}
+function detectGeju(ming, pals) {
+  const [idx, hua] = starIndex(pals), i = bi(ming);
+  const sf = new Set([BR[i], BR[(i + 4) % 12], BR[(i + 6) % 12], BR[(i + 8) % 12]]);
+  const nb = new Set([BR[(i + 1) % 12], BR[mod(i - 1, 12)]]);
+  const at = (s, zone) => !!idx[s] && zone.has(idx[s][0]);
+  const luInSf = at("祿存", sf) || hua.some(([k, , b]) => k === "祿" && sf.has(b));
+  const out = [];
+  if (["太陽","天梁","文昌"].every(s => at(s, sf)) && luInSf) out.push(["陽梁昌祿", "吉", chengse(idx, ["太陽","天梁","文昌"]), "利考試、功名"]);
+  if (["天機","太陰","天同","天梁"].every(s => at(s, sf))) out.push(["機月同梁", "吉", chengse(idx, ["天機","太陰","天同","天梁"]), "宜體制內、公職、穩定上班"]);
+  if (pals[ming].main.length && at("天府", sf) && at("天相", sf)) out.push(["府相朝垣", "吉", chengse(idx, ["天府","天相"]), "穩重有守，衣食有靠"]);
+  const mset = new Set([ming]);
+  if (["七殺","破軍","貪狼"].some(s => at(s, mset))) out.push(["殺破狼", "性質", chengse(idx, ["七殺","破軍","貪狼"]), "開創、變動，大起大落"]);
+  for (const sha of ["火星","鈴星"])
+    if (idx["貪狼"] && idx[sha] && idx["貪狼"][0] === idx[sha][0] && sf.has(idx["貪狼"][0]))
+      out.push([sha === "火星" ? "火貪" : "鈴貪", "吉", chengse(idx, ["貪狼", sha]), "橫發爆發，但來得快去得快"]);
+  const ks = new Set(hua.filter(([k, , b]) => sf.has(b) && k !== "忌").map(x => x[0]));
+  if (ks.has("祿") && ks.has("權") && ks.has("科")) out.push(["三奇加會", "吉", 1.0, "生年祿權科會命，格局高"]);
+  if (idx["太陽"] && idx["太陰"] && at("太陽", sf) && at("太陰", sf)) {
+    const a = MAIN_B[idx["太陽"][1]], b = MAIN_B[idx["太陰"][1]];
+    if (Math.min(a, b) >= 1.5) out.push(["日月並明", "吉", chengse(idx, ["太陽","太陰"]), "光明磊落，貴人多"]);
+    else if (Math.max(a, b) <= 0) out.push(["日月反背", "凶", chengse(idx, ["太陽","太陰"]), "勞碌、付出多回報少"]);
+  }
+  for (const [a, b, name, kind] of [["左輔","右弼","左右夾命","吉"], ["文昌","文曲","昌曲夾命","吉"], ["天魁","天鉞","魁鉞夾命","吉"],
+      ["擎羊","陀羅","羊陀夾命","凶"], ["地空","地劫","空劫夾命","凶"], ["火星","鈴星","火鈴夾命","凶"]]) {
+    if (name === "羊陀夾命" && at("祿存", mset)) continue;
+    if (idx[a] && idx[b] && idx[a][0] !== idx[b][0] && nb.has(idx[a][0]) && nb.has(idx[b][0]))
+      out.push([name, kind, 0.5, "命宮兩鄰被" + (kind === "吉" ? "吉星" : "煞星") + "夾"]);
+  }
+  for (const [k, s, b] of hua)
+    if (k === "忌" && idx["祿存"] && idx["祿存"][0] === b) {
+      const pal = PAL[mod(bi(ming) - bi(b), 12)];
+      out.push(["羊陀夾忌", sf.has(b) ? "凶" : "提醒", 0.5, `${s}化忌與祿存同在${pal}（${b}），被羊陀夾住`]);
+    }
+  if (!pals[ming].main.length && pals[ming].bad.some(x => x[0] === "地空" || x[0] === "地劫")) out.push(["命無正曜逢空劫", "凶", 0.5, "自我定位不穩，易落空"]);
+  return out;
+}
+function gejuBonus(g) { let t = 0; for (const [, k, c] of g) { if (k === "吉") t += GEJU_W * c; else if (k === "凶") t -= GEJU_W * (1 - c); } return pyRound(t, 2); }
+
+// 單張盤的「大限、流年」牌組
+function makeCtx(ming, pals, birth) { return { ming, pals, birth }; }
+function daxian(ctx, year) {
+  const [, sex, ju, by] = ctx.birth, age = year - by + 1, step = (sex === "陽男" || sex === "陰女") ? 1 : -1;
+  const k = Math.max(0, Math.floor((age - ju) / 10));
+  return [BR[mod(bi(ctx.ming) + step * k, 12)], ju + 10 * k, ju + 10 * k + 9, age];
+}
+const clone = o => JSON.parse(JSON.stringify(o));
+function starPos(pals) { const pos = {}; for (const b of BR) { const p = pals[b]; for (const [s, br] of [...p.main, ...p.good, ...(p.extra || [])]) pos[s] = [b, br]; } return pos; }
+function addFlow(pals, gan, w) {
+  const lc = LUCUN[gan], [k, y] = KUI_YUE[gan];
+  for (const [s, b] of [["祿存", lc], ["天魁", k], ["天鉞", y], ["文昌", LIUCHANG[gan]], ["文曲", LIUQU[gan]]]) pals[b]._adj = (pals[b]._adj || 0) + w * GOOD_F[BRIGHT[s][b]];
+  for (const [s, b] of [["擎羊", mv(lc, 1)], ["陀羅", mv(lc, -1)]]) pals[b]._adj = (pals[b]._adj || 0) - w * BAD_F[BRIGHT[s][b]];
+}
+function withDaxian(ctx, dbr) {
+  const pals = clone(ctx.pals), stem = palaceStem(ctx.birth[0], dbr), pos = starPos(pals), landed = [];
+  SIHUA[stem].forEach((star, i) => { if (pos[star]) { const [b, br] = pos[star]; (pals[b].dhua = pals[b].dhua || []).push(["祿權科忌"[i], star, br || "平"]); landed.push(["祿權科忌"[i], star, b]); } });
+  addFlow(pals, stem, DX_W);
+  return [pals, stem, landed];
+}
+const yearGz = y => [GAN[mod(y - 4, 10)], BR[mod(y - 4, 12)]];
+function withYear(ctx, year) {
+  const dx = daxian(ctx, year), [pals, dstem] = withDaxian(ctx, dx[0]), [yg, yb] = yearGz(year), pos = starPos(pals), ll = [];
+  SIHUA[yg].forEach((star, i) => { if (pos[star]) { const [b, br] = pos[star]; (pals[b].lhua = pals[b].lhua || []).push(["祿權科忌"[i], star, br || "平"]); ll.push(["祿權科忌"[i], star, b]); } });
+  addFlow(pals, yg, LN_W);
+  return [pals, [dx[0], dstem, dx[1], dx[2], dx[3]], [yg, yb, ll]];
+}
+function stacks(pals) {
+  const res = [];
+  for (const b of BR) {
+    const p = pals[b], allh = [...p.hua.map(h => ["生", h[0]]), ...(p.dhua || []).map(h => ["限", h[0]]), ...(p.lhua || []).map(h => ["年", h[0]])];
+    const ji = allh.filter(x => x[1] === "忌").map(x => x[0]).join(""), lu = allh.filter(x => x[1] === "祿").map(x => x[0]).join("");
+    if (ji || lu) res.push([b, lu, ji]);
+  }
+  return res;
+}
+const natalRole = (ctx, b) => PAL[mod(bi(ctx.ming) - bi(b), 12)];
+function yearCard(ctx, year) {
+  const [pals] = withYear(ctx, year), st = stacks(pals);
+  return { ji2: st.filter(x => x[2].length >= 2).map(x => [natalRole(ctx, x[0]), x[2]]), lu2: st.filter(x => x[1].length >= 2).map(x => [natalRole(ctx, x[0]), x[1]]) };
+}
+function daxianHand(ctx, year) { const [dbr, a0, a1] = daxian(ctx, year), [pals, stem, landed] = withDaxian(ctx, dbr); return { label: `${a0}-${a1}歲 ${stem}${dbr}`, hand: roleHand(pals, dbr), hua: landed }; }
+function yearHand(ctx, year) { const [pals, , [yg, yb, ll]] = withYear(ctx, year); return { label: `${year} ${yg}${yb}`, hand: roleHand(pals, yb), hua: ll }; }
+const ACT = { 祿好: "進攻：主動打這張牌", 祿中: "經營：順勢加碼", 祿弱: "補牌：趁機補強", 忌好: "守成：扛得住但別加碼", 忌中: "小心：控制範圍", 忌弱: "避險：降曝險、借王牌" };
+const sortedRoles = hand => Object.keys(hand).map((r, i) => [r, i]).sort((a, b) => (hand[b[0]][0] - hand[a[0]][0]) || (a[1] - b[1])).map(x => x[0]);
+function plan(ctx, years) {
+  const nat = roleHand(ctx.pals, ctx.ming), aces = sortedRoles(nat).slice(0, 2), rows = [];
+  for (const y of years) {
+    const D = daxianHand(ctx, y), Y = yearHand(ctx, y), yc = yearCard(ctx, y);
+    const land = (H, level, kind) => {
+      const b = H.hua.find(h => h[0] === kind)[2], r = Object.keys(H.hand).find(k => H.hand[k][1] === b), s = H.hand[r][0], g = lgrade(s, level);
+      return { role: r, natal: natalRole(ctx, b), score: s, grade: g, act: ACT[kind + g] };
+    };
+    rows.push({ y, label: Y.label, dx: D.label, lu: land(Y, "流年", "祿"), ji: land(Y, "流年", "忌"),
+      ji2: yc.ji2.map(([a, b]) => `${a}（${b}）`).join("、"), lu2: yc.lu2.map(([a, b]) => `${a}（${b}）`).join("、") });
+  }
+  return { aces, rows };
+}
+
+// ───────── 對外：一張盤的完整結果（同 web_api.py）─────────
+function chartOf(y, m, d, h, mi, male, lon) {
+  const t = trueSolar(y, m, d, h, mi, 8, 0, lon ?? 120.68);
+  let tp = t; if (t.getUTCHours() === 23) { const n = new Date(t.getTime() + DAY); n.setUTCHours(0); tp = n; }   // 晚子時換日
+  const T = ymdhm(tp), c = paipan(T.y, T.m, T.d, T.h, T.mi, male);
+  const [ming, pals] = toCards(c);
+  tagV8(ming, pals, c.hour);                       // retag_all：tag_jie 已在 toCards，tag_v8 在此
+  return { t, c, ctx: makeCtx(ming, pals, birthMeta(c, T.y)) };
+}
+function hand(name, y, m, d, h, mi, male, y0, y1) {
+  const { t, c, ctx } = chartOf(y, m, d, h, mi, male), { ming, pals } = ctx;
+  const H = roleHand(pals, ming), [zy, cs] = zaiyao(c);
+  const rows = Object.keys(H).map(role => {
+    const [s, b] = H[role], p = pals[b];
+    const lu = p.good.some(x => x[0] === "祿存") || p.hua.some(x => x[0] === "祿");
+    return { role, br: b, score: pyRound(s, 1), grade: lgrade(s, "本命"), stars: p.main.map(x => x[0] + x[1]).join("、") || "空宮",
+      hua: p.hua.map(x => `${x[1]}化${x[0]}`).join(" "), cs: cs[b], tags: zy[b].map(x => [x, ZD.ZAI_MEANING[x]]), luma: zy[b].includes("天馬") && lu };
+  });
+  const gj = detectGeju(ming, pals), P = plan(ctx, Array.from({ length: y1 - y0 + 1 }, (_, i) => y0 + i));
+  P.rows.forEach(r => { r.lu.score = pyRound(r.lu.score, 1); r.ji.score = pyRound(r.ji.score, 1); });
+  const count = { 好: 0, 中: 0, 弱: 0 }; rows.forEach(r => count[r.grade]++);
+  return { name, solar: fmt(t), head: `${c.year}年 農曆${c.month}月${c.day}日 ${c.hour}時｜命宮${ming}｜${c.sex} ${c.ju}局`,
+    flags: c.flags, rows, count, total: pyRound(sum(Object.values(H).map(x => x[0])), 1),
+    mingge: pyRound(H["命宮"][0] + gejuBonus(gj), 1), geju: gj.map(([n, k]) => `${n}（${k}）`), aces: P.aces, years: P.rows };
+}
+function card(name, y, m, d, h, mi, male) {
+  const { ctx } = chartOf(y, m, d, h, mi, male), H = roleHand(ctx.pals, ctx.ming);
+  const roles = Object.keys(ZD.LABEL), scores = {}, grades = {};
+  roles.forEach(r => { scores[r] = H[r][0]; grades[r] = lgrade(H[r][0], "本命"); });
+  const order = roles.map((r, i) => [r, i]).sort((a, b) => (scores[b[0]] - scores[a[0]]) || (a[1] - b[1])).map(x => x[0]);
+  const st = {}; roles.forEach(r => st[r] = grades[r] === "好" ? 4 : grades[r] === "中" ? 3 : 2);
+  if (grades[order[0]] === "好") st[order[0]] = 5;
+  if (grades[order[order.length - 1]] === "弱") st[order[order.length - 1]] = 1;
+  const top2 = order.slice(0, 2), low2 = order.slice(-2).reverse();
+  const weak = low2.filter(r => grades[r] === "弱");
+  const extra = order.slice(2).filter(r => !low2.includes(r)).slice(0, 2 - weak.length);
+  const qs = [...[...top2, ...extra].map(r => [ZD.STRONG[r], "像", r, "強項"]), ...weak.map(r => [ZD.WEAK[r], "像", r, "弱項"]), [ZD.WEAK[top2[0]], "不像", top2[0], "反向題"]];
+  const [act, check] = ZD.ACTION[low2[0]], L = ZD.LABEL;
+  const starTxt = n => "★".repeat(n) + "☆".repeat(5 - n);
+  const text = [`【${name}的家長卡】`, "", "一、先請你回答（像／不像就好）", ...qs.map((q, i) => `${i + 1}. ${q[0]}`), "",
+    "二、他的能力星等（不是好壞，是哪裡比較自然、哪裡要多陪）", ...order.map(r => `${starTxt(st[r])}  ${L[r]}`), "",
+    `最亮的地方：${L[top2[0]]}、${L[top2[1]]}`, `相對要多陪的地方：${L[low2[0]]}、${L[low2[1]]}`, "",
+    `三、今天就能做的一件事（針對「${L[low2[0]]}」）`, act, `怎麼知道有沒有效：${check}`, "",
+    "※ 這是命理角度的觀察參考，不是診斷，也不代表孩子的好壞。對不上的地方請直接告訴我。"].join("\n");
+  const key = [`── 對照答案（只給你看）${name} ──`, ...qs.map((q, i) => `${i + 1}. 盤面預期：${q[1]}（${q[3]}：${q[2]} ${sgn1(scores[q[2]])} ${grades[q[2]]}）`),
+    "判讀：第 5 題答「不像」，且 1–4 題至少 3 題「像」，才算對上；全部都「像」要小心是籠統描述。"].join("\n");
+  return { text, key, qs, stars: order.map(r => [L[r], st[r]]), top: top2.map(r => L[r]), low: low2.map(r => L[r]), focus: L[low2[0]], act, check };
+}
+
+// ───────── 紫微報告 prompt（格式同 make_prompt.ziwei_text；手機版雜曜只列 23 顆）─────────
+const MING_ZHU = ["貪狼","巨門","祿存","文曲","廉貞","武曲","破軍","武曲","廉貞","文曲","祿存","巨門"];
+const SHEN_ZHU = ["火星","天相","天梁","天同","文昌","天機","火星","天相","天梁","天同","文昌","天機"];
+const MONTHN = ["正月","二月","三月","四月","五月","六月","七月","八月","九月","十月","冬月","臘月"];
+const XX_START = { 2: 4, 6: 4, 10: 4, 8: 10, 0: 10, 4: 10, 5: 7, 9: 7, 1: 7, 11: 1, 3: 1, 7: 1 };
+const DAYN = d => d === 10 ? "初十" : d === 20 ? "二十" : d === 30 ? "三十" : ["初","十","廿","三"][Math.floor(d / 10)] + "一二三四五六七八九十"[d % 10 - 1];
+function ziweiText(y, m, d, h, mi, male, lon, thisYear) {
+  const { c } = chartOf(y, m, d, h, mi, male, lon), pos = c.pos, [zy, , zpos] = zaiyao(c), ming = c.ming;
+  const yg = c.year[0], pal = b => PAL[mod(bi(ming) - bi(b), 12)];
+  const nat = {}; SIHUA[yg].forEach((s, i) => nat[s] = "祿權科忌"[i]);
+  const lunarYear = c.lunar.year, ju = c.ju, fw = c.sex === "陽男" || c.sex === "陰女";
+  const nayinName = ZD.NAYIN_NAMES[Math.floor(jiazi(palaceStem(yg, ming), ming) / 2)];   // 命宮干支納音（定五行局用）
+  const L = [`${c.sex}，${nayinName}，${["水二局","木三局","金四局","土五局","火六局"][ju - 2]}，農曆${c.year}年${c.lunar.leap ? "閏" : ""}${MONTHN[c.lunar.month - 1]}${DAYN(c.lunar.day)} ${c.hour}時，命主${MING_ZHU[bi(ming)]}，身主${SHEN_ZHU[bi(c.year[1])]}，命宮在${ming}，身宮在${c.shen}（${pal(c.shen)}）`, ""];
+  const tag = (s, extra) => { const t = []; if (nat[s]) t.push("生年化" + nat[s]); if (extra && extra[s]) t.push(...extra[s]); return t.length ? `（${t.join("、")}）` : ""; };
+  for (let k = 0; k < 12; k++) {
+    const b = BR[mod(bi(ming) - k, 12)], stem = palaceStem(yg, b);
+    const mains = MAIN14.filter(s => pos[s] === b).map(s => s + BRIGHT[s][b] + tag(s)).join("、") || "空宮（借對宮主星）";
+    const NOB = new Set(["天魁", "天鉞", "祿存"]);   // 排盤引擎不標這三顆的亮度
+    const aux = ["左輔","右弼","文昌","文曲","天魁","天鉞"].filter(s => pos[s] === b).map(s => s + (NOB.has(s) ? "" : BRIGHT[s][b]) + tag(s));
+    if (pos["祿存"] === b) aux.push("祿存");
+    if (zpos["天馬"] === b) aux.push("天馬");
+    aux.push(...BAD.filter(s => pos[s] === b).map(s => s + BRIGHT[s][b] + tag(s)));
+    const minor = zy[b].filter(s => s !== "天馬");
+    const selfh = SIHUA[stem].map((s, i) => ((pos[s] === b) ? s + "祿權科忌"[i] : null)).filter(Boolean);
+    let row = `【${PAL[k]}】${stem}${b}　主星：${mains}`;
+    if (aux.length) row += `　輔星：${aux.join("、")}`;
+    if (minor.length) row += `　雜曜：${minor.join("、")}`;
+    row += `　三方四正會：${[4, 8, 6].map(o => pal(BR[mod(bi(b) + o, 12)])).join("、")}`;
+    if (selfh.length) row += `　宮干自化：${selfh.join("、")}`;
+    L.push(row);
+  }
+  // 大限
+  const dxs = [...BR].map(b => { const k = fw ? mod(bi(b) - bi(ming), 12) : mod(bi(ming) - bi(b), 12); return { b, a: ju + 10 * k, e: ju + 10 * k + 9 }; }).sort((p, q) => p.a - q.a);
+  const ageOf = yy => yy - lunarYear + 1, birthY = y;
+  const luck = ["大限（每十年一步，陰男陽女逆行、陽男陰女順行）："];
+  const curAge = ageOf(thisYear);
+  for (const x of dxs) luck.push(`  ${x.a}–${x.e} 歲（${birthY + x.a - 1}–${birthY + x.e - 1}）：大限命宮在${palaceStem(yg, x.b)}${x.b}（本命${pal(x.b)}）${x.a <= curAge && curAge <= x.e ? " ← 目前" : ""}`);
+  const hi = bi(c.hour), ziDou = mod(0 - (c.month - 1) + hi, 12);
+  const TIANMA = b => ({ 寅午戌: "申", 申子辰: "寅", 巳酉丑: "亥", 亥卯未: "巳" })[["寅午戌","申子辰","巳酉丑","亥卯未"].find(k => k.includes(b))];
+  for (const yy of [thisYear, thisYear + 1]) {
+    const age = ageOf(yy), [lg, lb] = yearGz(yy), dx = dxs.find(x => x.a <= age && age <= x.e);
+    const xx = BR[male ? mod(XX_START[bi(c.year[1])] + (age - 1), 12) : mod(XX_START[bi(c.year[1])] - (age - 1), 12)];
+    luck.push(`\n${yy} 年（${lg}${lb}，虛歲 ${age}）：流年命宮在${lb}（本命${pal(lb)}），小限在${xx}（本命${pal(xx)}）`);
+    luck.push(`  流年四化：${SIHUA[lg].map((s, i) => s + "化" + "祿權科忌"[i]).join("、")}`);
+    let dstem = null;
+    if (dx) { dstem = palaceStem(yg, dx.b); luck.push(`  大限四化：${SIHUA[dstem].map((s, i) => s + "化" + "祿權科忌"[i]).join("、")}`); }
+    const ly = {}; for (const b of BR) ly[b] = [];
+    const layers = [["年", lg, lb]]; if (dx) layers.push(["大", dstem, dx.b]);
+    for (const [tg, st, br] of layers) {
+      const lc = LUCUN[st], [kui, yue] = KUI_YUE[st], luan = BR[mod(3 - bi(br), 12)];
+      for (const [nm, b] of [["祿", lc], ["羊", mv(lc, 1)], ["陀", mv(lc, -1)], ["昌", LIUCHANG[st]], ["曲", LIUQU[st]], ["魁", kui], ["鉞", yue], ["馬", TIANMA(br)], ["鸞", luan], ["喜", mv(luan, 6)]]) ly[b].push(tg + nm);
+    }
+    luck.push("  流曜：" + [...BR].filter(b => ly[b].length).map(b => `${pal(b)}：${ly[b].join("、")}`).join("；"));
+    const dj = mod(bi(lb) + ziDou, 12);
+    luck.push("  流月：" + MONTHN.map((n, i) => `${n}在${pal(BR[(dj + i) % 12])}`).join("、"));
+  }
+  return [L.join("\n"), luck.join("\n")];
+}
+function handText(y, m, d, h, mi, male, lon, thisYear) {
+  const { ctx } = chartOf(y, m, d, h, mi, male, lon), H = roleHand(ctx.pals, ctx.ming), gj = detectGeju(ctx.ming, ctx.pals);
+  const order = sortedRoles(H), sgn = sgn1;
+  const L = ["**手牌系統：本命十二宮相對強弱（本系統自訂評分）**",
+    "使用方式：分數是用固定規則（三方四正加權、四化、格局、星性修正）算出的相對強弱，只用來找出「哪幾塊生活比較有底氣、哪幾塊要多花力氣補」，可作為第三、四段（優勢、卡點）的輔助依據。此分數未通過事件預測的統計驗證：不得用來判斷任何時期吉凶、不得據以預言事件；與盤面其他資料矛盾時以盤面為準。分數本身屬術語，正文不得出現，只能放括號。",
+    "（好 = 前段、中 = 中段、弱 = 後段；12 宮依分數由高到低）",
+    ...order.map(r => `- ${r}（${H[r][1]}）${sgn(H[r][0])}　${lgrade(H[r][0], "本命")}`),
+    `12 宮合計 ${sgn(sum(Object.values(H).map(x => x[0])))}；命格總分 ${sgn(H["命宮"][0] + gejuBonus(gj))}；格局：${gj.map(([n, k]) => `${n}（${k}）`).join("、") || "無"}`,
+    `相對最強（可借力）：${order.slice(0, 2).join("、")}；相對最弱（需補強）：${order.slice(-2).join("、")}`,
+    "今明兩年祿忌落點（只標落在本命哪一塊生活，不代表吉凶）："];
+  for (const yy of [thisYear, thisYear + 1]) {
+    const D = daxianHand(ctx, yy), Y = yearHand(ctx, yy), yc = yearCard(ctx, yy);
+    const nb = (H2, k) => natalRole(ctx, H2.hua.find(x => x[0] === k)[2]);
+    L.push(`- ${yy}：十年祿在本命${nb(D, "祿")}、十年忌在本命${nb(D, "忌")}；當年祿在本命${nb(Y, "祿")}、當年忌在本命${nb(Y, "忌")}` +
+      (yc.ji2.length ? `；當年忌與本命或十年忌落同一宮：${yc.ji2.map(([a, b]) => `${a}（${b}）`).join("、")}` : ""));
+  }
+  return L.join("\n");
+}
+function fill(block, values) {
+  return block.replace(/\{\{([\s\S]*?)\}\}/g, (all, inner) => { for (const k in values) if (inner.includes(k)) return values[k]; return all; });
+}
+function prompt(p) {
+  const [y, m, d] = p.bday.split("-").map(Number), [h, mi] = p.btime.split(":").map(Number), male = p.gender === "男";
+  const now = new Date(), thisYear = now.getFullYear();
+  const age = thisYear - y - (((now.getMonth() + 1) * 100 + now.getDate()) < (m * 100 + d) ? 1 : 0);
+  let [chart, luck] = ziweiText(y, m, d, h, mi, male, p.lon, thisYear);
+  if (p.hand) chart += "\n\n" + handText(y, m, d, h, mi, male, p.lon, thisYear);
+  const values = { "完整 /": "完整", "完整四柱 /": "完整", 模式A: p.mode === "B" ? "模式B 生命回顧敘事版" : "模式A 完整分析版", "是 / 否": p.first || "是",
+    "三柱或四柱干支、十神、藏干；或紫微": chart, 四柱或三柱干支: chart, 起運歲數: luck, 性別: p.gender, 年齡: `${age} 歲`,
+    "清晨／": `已知確切時間 ${p.btime}`, "例：40歲": p.situation || "（未提供）", "年份＋事件": p.events || "（未提供）",
+    "1-3 個問題": p.questions || "（未提供，請依盤面重點解讀）" };
+  return fill(ZD.ZIWEI_PROMPT, values);
+}
+
+const API = { hand, card, prompt, ziweiText, handText, chartOf, trueSolar, solarToLunar, pyRound };
+if (typeof module !== "undefined") module.exports = API; else root.ZW = API;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+                  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  const PLACES = [["台北",121.56],["新北",121.47],["基隆",121.74],["桃園",121.30],["新竹",120.97],["苗栗",120.82],["台中",120.68],["彰化",120.54],["南投",120.68],["雲林",120.53],["嘉義",120.45],["台南",120.21],["高雄",120.31],["屏東",120.49],["宜蘭",121.75],["花蓮",121.60],["台東",121.15],["澎湖",119.57],["金門",118.32]];
+  $("pl").innerHTML = PLACES.map(([n, l]) => `<option value="${l}"${n === "台中" ? " selected" : ""}>${n}</option>`).join("");
+  $("y0").value = new Date().getFullYear();
+
+  const seg = (a, b) => { $(a).onclick = () => { $(a).setAttribute("aria-pressed", "true"); $(b).setAttribute("aria-pressed", "false"); };
+                          $(b).onclick = () => { $(b).setAttribute("aria-pressed", "true"); $(a).setAttribute("aria-pressed", "false"); }; };
+  seg("sexM", "sexF"); seg("mdA", "mdB"); seg("fsY", "fsN");
+  const male = () => $("sexM").getAttribute("aria-pressed") === "true";
+
+  // 分頁
+  const TABS = ["card", "hand", "year", "prompt"];
+  function show(t) { TABS.forEach(x => { $("t-" + x).setAttribute("aria-selected", x === t); $("p-" + x).hidden = x !== t; }); store.set("zw.tab", t); }
+  TABS.forEach(x => $("t-" + x).onclick = () => show(x));
+
+  let cur = null, answers = [];
+  function read() {
+    const name = $("nm").value.trim() || "未命名", bd = $("bd").value, bt = $("bt").value, y0 = parseInt($("y0").value, 10);
+    if (!bd) throw new Error("請填國曆生日。");
+    if (!bt) throw new Error("請填出生時間；紫微斗數一定要有時辰。");
+    const [y, m, d] = bd.split("-").map(Number), [h, mi] = bt.split(":").map(Number);
+    if (y < 1901 || y > 2099) throw new Error("生日年份請在 1901 到 2099 之間。");
+    if (!(y0 >= 1901 && y0 <= 2150)) throw new Error("應對表起始年請填 4 位數年份。");
+    return { name, y, m, d, h, mi, male: male(), y0 };
+  }
+  function run() {
+    $("err").hidden = true;
+    let p;
+    try { p = read(); } catch (e) { $("err").textContent = e.message; $("err").hidden = false; return; }
+    try {
+      const H = ZW.hand(p.name, p.y, p.m, p.d, p.h, p.mi, p.male, p.y0, p.y0 + 4);
+      const C = ZW.card(p.name, p.y, p.m, p.d, p.h, p.mi, p.male);
+      cur = { p, H, C }; answers = Array(C.qs.length).fill(null);
+      renderWho(); renderCard(); renderHand(); renderYear();
+      $("pOut").hidden = true; $("pAct").hidden = true;
+      remember(p);
+    } catch (e) { $("err").textContent = "排盤失敗：" + e.message; $("err").hidden = false; }
+  }
+  $("f").addEventListener("submit", e => { e.preventDefault(); run(); });
+
+  // 最近查過（只存在這支手機）
+  function remember(p) {
+    if (p.name.startsWith("範例")) return;
+    const list = store.get("zw.recent", []).filter(x => x.name !== p.name);
+    list.unshift({ name: p.name, bd: $("bd").value, bt: $("bt").value, male: p.male });
+    store.set("zw.recent", list.slice(0, 8)); renderRecent();
+  }
+  function renderRecent() {
+    const list = store.get("zw.recent", []);
+    $("recentBox").hidden = !list.length;
+    $("recent").innerHTML = list.map((x, i) => `<button type="button" class="chip" data-i="${i}">${esc(x.name)}</button>`).join("");
+    $("recent").querySelectorAll("button").forEach(b => b.onclick = () => {
+      const x = list[+b.dataset.i]; $("nm").value = x.name; $("bd").value = x.bd; $("bt").value = x.bt;
+      (x.male ? $("sexM") : $("sexF")).click(); run();
+    });
+  }
+
+  function renderWho() {
+    const { H, p } = cur;
+    $("who").innerHTML = `<div><b>${esc(p.name)}</b>　${p.y}/${p.m}/${p.d} ${String(p.h).padStart(2, "0")}:${String(p.mi).padStart(2, "0")}（${p.male ? "男" : "女"}）</div>
+      <div>真太陽時 ${H.solar}　${esc(H.head)}</div>` +
+      (H.flags.length ? `<div class="flag">注意：${esc(H.flags.join("、"))}。時辰或日界可能有爭議，建議再確認出生時間。</div>` : "");
+  }
+
+  function renderCard() {
+    const C = cur.C, el = $("p-card");
+    el.innerHTML = `<h2>${esc(cur.p.name)}的家長卡</h2>
+      <div><h3>一、先請家長回答</h3>${C.qs.map((q, i) => `<div class="q"><p><span class="num">${i + 1}.</span>${esc(q[0])}</p>
+        <div class="yn" role="group" aria-label="第 ${i + 1} 題"><button type="button" data-i="${i}" data-v="像" aria-pressed="false">像</button><button type="button" data-i="${i}" data-v="不像" aria-pressed="false">不像</button></div></div>`).join("")}</div>
+      <div class="verdict wait" id="vd">5 題都回答後，這裡會顯示有沒有對上。</div>
+      <div><h3>二、能力星等</h3><p class="note" style="margin:2px 0 8px">不是好壞，是哪裡比較自然、哪裡要多陪。</p>
+        <div class="stars">${C.stars.map(([l, n]) => `<span class="s" aria-label="${n} 顆星">${"★".repeat(n)}${"☆".repeat(5 - n)}</span><span>${esc(l)}</span>`).join("")}</div></div>
+      <div class="hl">最亮的地方：<b>${esc(C.top.join("、"))}</b><br>相對要多陪的地方：<b>${esc(C.low.join("、"))}</b></div>
+      <div><h3>三、今天就能做的一件事</h3><div class="act" style="margin-top:6px">${esc(C.act)}<small>怎麼知道有沒有效：${esc(C.check)}</small></div></div>
+      <div class="row"><button class="btn small" type="button" id="cCopy">複製給家長（LINE 用）</button><span class="note" id="cMsg"></span></div>
+      <details><summary>對照答案（只給你看）</summary><pre class="key">${esc(C.key)}</pre></details>`;
+    el.querySelectorAll(".yn button").forEach(b => b.onclick = () => {
+      const i = +b.dataset.i; answers[i] = b.dataset.v;
+      b.parentNode.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+      verdict();
+    });
+    $("cCopy").onclick = () => copy(C.text, $("cMsg"));
+  }
+  function verdict() {
+    const C = cur.C, vd = $("vd");
+    if (answers.some(a => a === null)) { vd.className = "verdict wait"; vd.textContent = `已回答 ${answers.filter(a => a).length}／5 題。`; return; }
+    const hit = C.qs.slice(0, 4).filter((q, i) => answers[i] === q[1]).length, rev = answers[4] === "不像";
+    const all = answers.every(a => a === "像");
+    if (rev && hit >= 3) { vd.className = "verdict ok"; vd.textContent = `對上了：前 4 題中 ${hit} 題相符，反向題也答「不像」。可以照這張卡往下聊。`; }
+    else if (all) { vd.className = "verdict no"; vd.textContent = "5 題都答「像」，代表描述可能太籠統，這次不算對上；請以家長舉的實際例子為準。"; }
+    else { vd.className = "verdict no"; vd.textContent = `對不太上：前 4 題 ${hit} 題相符，反向題答「${answers[4]}」。可以先問家長哪幾題不像、舉個例子，再確認出生時間。`; }
+  }
+
+  const sgn = v => (v > 0 ? "+" : "") + v.toFixed(1);
+  function renderHand() {
+    const H = cur.H, el = $("p-hand"), S = 6;
+    const bar = s => { const w = Math.min(Math.abs(s), S) / S * 50; return s >= 0 ? `<i style="left:50%;width:${w}%;background:var(--good)"></i>` : `<i style="right:50%;width:${w}%;background:var(--weak)"></i>`; };
+    el.innerHTML = `<h2>本命十二宮</h2>
+      <div class="stats">
+        <div class="stat"><div class="k">好／中／弱</div><div class="v">${H.count["好"]}／${H.count["中"]}／${H.count["弱"]}</div></div>
+        <div class="stat"><div class="k">12 宮合計</div><div class="v">${sgn(H.total)}</div></div>
+        <div class="stat"><div class="k">命格總分</div><div class="v">${sgn(H.mingge)}</div></div>
+      </div>
+      <div class="note">格局：${esc(H.geju.join("、") || "無")}　｜　長條往右是有底氣、往左是要補強（滿格 ±6）</div>
+      <div>${H.rows.map(r => `<div class="pal">
+        <span class="nm">${r.role}<small>${r.br}</small></span>
+        <div class="bar" aria-hidden="true">${bar(r.score)}</div>
+        <span class="sc">${sgn(r.score)}<span class="pill g-${r.grade}">${r.grade}</span></span>
+        <div class="det"><span class="st">${esc(r.stars)}</span>${r.hua ? `<span class="hua">${esc(r.hua)}</span>` : ""}<span>　［${esc(r.cs)}］</span>
+          <div>${r.tags.map(([t, m]) => `<span class="tag">${esc(t)}：${esc(m)}</span>`).join("")}${r.luma ? `<span class="tag" style="border-color:var(--gold)">★祿馬交馳：動中得財</span>` : ""}</div></div>
+      </div>`).join("")}</div>
+      <p class="note" style="margin:0">雜曜與長生十二神只作標籤，不計分。</p>`;
+  }
+  function renderYear() {
+    const H = cur.H, el = $("p-year");
+    const line = (k, d) => `<div class="mv"><span class="seal ${k === "祿" ? "lu" : "ji"}">${k}</span><div><span class="a">${esc(d.act)}</span><br>
+      <small>落在本命${esc(d.natal)}（這一年的${esc(d.role)}）${sgn(d.score)}<span class="pill g-${d.grade}">${d.grade}</span></small></div></div>`;
+    el.innerHTML = `<h2>${cur.p.y0}–${cur.p.y0 + 4} 應對表</h2>
+      <div class="hl">本命王牌（遇到難關可以借力）：<b>${esc(H.aces.join("、"))}</b></div>
+      <div>${H.years.map(y => `<div class="yr"><div class="t"><b>${esc(y.label)}</b><span>大限 ${esc(y.dx)}</span></div>
+        ${line("祿", y.lu)}${line("忌", y.ji)}
+        ${y.ji2 ? `<div><span class="red">疊忌紅燈</span> <span class="note">${esc(y.ji2)}：這一年該宮先訂好規則再行動</span></div>` : ""}
+        ${y.lu2 ? `<div class="note">疊祿：${esc(y.lu2)}</div>` : ""}</div>`).join("")}</div>
+      <p class="note" style="margin:0">應對表是規劃步調用的規則，不是預測；驗證結果顯示這些訊號沒有預測力。</p>`;
+  }
+
+  $("pGo").onclick = () => {
+    if (!cur) { run(); if (!cur) return; }
+    const p = cur.p;
+    try {
+      const txt = ZW.prompt({ bday: `${p.y}-${String(p.m).padStart(2, "0")}-${String(p.d).padStart(2, "0")}`, btime: `${String(p.h).padStart(2, "0")}:${String(p.mi).padStart(2, "0")}`,
+        gender: p.male ? "男" : "女", lon: parseFloat($("pl").value), situation: $("si").value.trim(), events: $("ev").value.trim(),
+        questions: $("qq").value.trim(), mode: $("mdA").getAttribute("aria-pressed") === "true" ? "A" : "B",
+        first: $("fsY").getAttribute("aria-pressed") === "true" ? "是" : "否", hand: $("hd").checked });
+      $("pOut").value = txt; $("pOut").hidden = false; $("pAct").hidden = false; $("pMsg").textContent = `共 ${txt.length} 字`;
+    } catch (e) { $("pMsg").textContent = "產生失敗：" + e.message; $("pAct").hidden = false; }
+  };
+  $("pCopy").onclick = () => copy($("pOut").value, $("pMsg"), $("pOut"));
+
+  function copy(text, msg, area) {
+    const fallback = () => {
+      let t = area; if (!t) { t = document.createElement("textarea"); t.value = text; t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); }
+      t.hidden = false; t.focus(); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+      if (!area) t.remove();
+      msg.textContent = ok ? "已複製" : "已選取全文，請長按後選「拷貝」";
+    };
+    try { navigator.clipboard.writeText(text).then(() => msg.textContent = "已複製", fallback); } catch (e) { fallback(); }
+  }
+
+  renderRecent();
+  run();
+  const t = store.get("zw.tab", "card"); show(TABS.includes(t) ? t : "card");
+})();
+</script>
